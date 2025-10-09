@@ -1,7 +1,9 @@
-from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from drf_extra_fields.fields import Base64ImageField
+from rest_framework import serializers
+from django.core.validators import MaxLengthValidator
 
+from recipes.constants import USERNAME_MAX_LENGTH, EMAIL_MAX_LENGTH
 from recipes.models import (
     Ingredient,
     IngredientAmount,
@@ -10,6 +12,11 @@ from recipes.models import (
     ShoppingCart,
     Tag,
     Recipe,
+)
+from recipes.validators import (
+    CustomUniqueValidator,
+    validate_username,
+    validate_recipe,
 )
 
 User = get_user_model()
@@ -51,6 +58,18 @@ class UserCreateSerializer(serializers.ModelSerializer):
             'last_name',
             'password',
         )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['email'].validators = [
+            CustomUniqueValidator(queryset=User.objects.all()),
+            MaxLengthValidator(EMAIL_MAX_LENGTH),
+        ]
+        self.fields['username'].validators = [
+            CustomUniqueValidator(queryset=User.objects.all()),
+            MaxLengthValidator(USERNAME_MAX_LENGTH),
+            validate_username,
+        ]
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
@@ -145,12 +164,14 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             'text',
             'cooking_time',
         )
+        validators = (validate_recipe,)
 
     def to_representation(self, instance):
         return RecipeListSerializer(instance, context=self.context).data
 
     def get_or_create_ingredients(self, ingredients_data, recipe):
         """Создать или получить ингредиенты и добавить их к рецепту."""
+
         for item in ingredients_data:
             amount = item.get('amount')
 
@@ -202,12 +223,9 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         ingredients_data = validated_data.pop('ingredients', [])
         tags = validated_data.pop('tags', [])
 
-        if tags:
-            instance.tags.set(tags)
-
-        if ingredients_data:
-            instance.ingredient_amounts.all().delete()
-            self.get_or_create_ingredients(ingredients_data, instance)
+        instance.tags.set(tags)
+        instance.ingredient_amounts.all().delete()
+        self.get_or_create_ingredients(ingredients_data, instance)
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)

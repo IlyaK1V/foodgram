@@ -38,12 +38,14 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (AllowAny,)
+    pagination_class = None
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (AllowAny,)
+    pagination_class = None
 
     def get_queryset(self):
         name = self.request.query_params.get('name')
@@ -63,8 +65,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeListSerializer
         return RecipeCreateSerializer
 
-    @action(detail=True, methods=['post', 'delete'],
-            permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['post', 'delete'])
     def favorite(self, request, pk=None):
         recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
@@ -98,8 +99,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         return Response({'short-link': short_url}, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['post', 'delete'],
-            permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['post', 'delete'])
     def shopping_cart(self, request, pk=None):
         recipe = get_object_or_404(Recipe, id=pk)
 
@@ -129,8 +129,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(
         detail=False,
         methods=['get'],
-        permission_classes=[IsAuthenticated],
-        url_path='download_shopping_cart'
+        url_path='download_shopping_cart',
     )
     def download_shopping_cart(self, request):
         user = request.user
@@ -206,7 +205,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
         user.set_password(new_password)
         user.save()
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=['get'],
             permission_classes=[IsAuthenticated])
@@ -263,16 +262,19 @@ class UserViewSet(viewsets.ModelViewSet):
                 user.avatar.delete(save=True)
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-        serializer = UserSerializer(
-            user,
-            data=request.data,
-            partial=True,
-            context={'request': request}
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        if request.data:
+            serializer = UserSerializer(
+                user,
+                data=request.data,
+                partial=True,
+                context={'request': request}
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
 
-        return Response(
-            {'avatar': request.build_absolute_uri(user.avatar.url)},
-            status=status.HTTP_200_OK
-        )
+            return Response(
+                {'avatar': request.build_absolute_uri(user.avatar.url)},
+                status=status.HTTP_200_OK
+            )
+        return Response({'errors': 'Нельзя передавать пустое поле avatar'},
+                        status=status.HTTP_400_BAD_REQUEST)
