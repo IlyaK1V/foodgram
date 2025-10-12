@@ -196,4 +196,3 @@ class TestAuthAndRegistration:
             'Убедитесь, что при вводе неверного пароля'
             f'возращается ответ со статусом {HTTPStatus.BAD_REQUEST}'
         )
-
