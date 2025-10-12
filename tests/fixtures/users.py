@@ -46,3 +46,18 @@ def auth_client_another(another_user):
     client = APIClient()
     client.force_authenticate(user=another_user)
     return client
+
+
+@pytest.fixture
+def subscribe_user_url(user):
+    return f'/api/users/{user.id}/subscribe/'
+
+
+@pytest.fixture
+def subscribe_another_user_url(another_user):
+    return f'/api/users/{another_user.id}/subscribe/'
+
+
+@pytest.fixture
+def user_me_url():
+    return '/api/users/me/'

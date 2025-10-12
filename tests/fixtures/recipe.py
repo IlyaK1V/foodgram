@@ -17,3 +17,18 @@ def recipe(user, tag, ingredient):
     IngredientAmount.objects.create(
         recipe=recipe, ingredient=ingredient, amount=2)
     return recipe
+
+
+@pytest.fixture
+def recipe_url(recipe):
+    return f'/api/recipes/{recipe.id}/'
+
+
+@pytest.fixture
+def recipe_favorite_url(recipe):
+    return f'/api/recipes/{recipe.id}/favorite/'
+
+
+@pytest.fixture
+def recipe_get_link_url(recipe):
+    return f'/api/recipes/{recipe.id}/get-link/'

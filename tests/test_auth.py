@@ -11,7 +11,6 @@ class TestAuthAndRegistration:
 
     USERS_URL = '/api/users/'
     TOKEN_LOGIN_URL = '/api/auth/token/login/'
-    ME_URL = '/api/users/me/'
     SET_PASSWORD_URL = '/api/users/set_password/'
 
     def test_registration_with_empty_data(self, no_auth_client):
@@ -153,7 +152,7 @@ class TestAuthAndRegistration:
             'содержащий существующий username данные, не сохраняется в БД'
         )
 
-    def test_login_and_access_me(self, user, no_auth_client):
+    def test_login_and_access_me(self, user, no_auth_client, user_me_url):
         """Проверка авторизации и получения данных"""
         login_data = {'email': user.email, 'password': 'testpassword'}
         response = no_auth_client.post(self.TOKEN_LOGIN_URL, data=login_data)
@@ -165,7 +164,7 @@ class TestAuthAndRegistration:
         assert token, 'Ответ должен содержать auth_token'
 
         no_auth_client.credentials(HTTP_AUTHORIZATION=f'Token {token}')
-        response = no_auth_client.get(self.ME_URL)
+        response = no_auth_client.get(user_me_url)
         assert response.status_code == HTTPStatus.OK, (
             'Убедитесь, что при передаче токена'
             f'возращается ответ со статусом {HTTPStatus.OK}'
