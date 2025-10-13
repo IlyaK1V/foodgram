@@ -1,0 +1,28 @@
+volumes:
+  pg_data_foodgram:
+  static_foodgram:
+
+services:
+  db:
+    image: postgres:13
+    env_file: .env
+    volumes:
+      - pg_data_foodgram:/var/lib/postgresql/data
+  backend:
+    build: ./backend/
+    env_file: .env
+    volumes:
+      - static_foodgram:/backend_static
+  frontend:
+    build: ./frontend/
+    env_file: .env
+    command: cp -r /app/build/. /frontend_static/
+    volumes:
+      - static_foodgram:/frontend_static
+  gateway:
+    build: ./foodgram_gateway/
+    env_file: .env
+    volumes:
+      - static_foodgram:/staticfiles/
+    ports:
+      - "${EXTERNAL_PORT}:80"
