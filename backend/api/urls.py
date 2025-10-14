@@ -5,6 +5,7 @@ from .views import (
     UserViewSet,
     TagViewSet,
     IngredientViewSet,
+    ShortLinkViewSet,
     RecipeViewSet,
 )
 
@@ -13,6 +14,7 @@ router.register('users', UserViewSet, basename='users')
 router.register('tags', TagViewSet, basename='tags')
 router.register('ingredients', IngredientViewSet, basename='ingredients')
 router.register('recipes', RecipeViewSet, basename='recipes')
+router.register('s', ShortLinkViewSet, basename='shortlink')
 
 urlpatterns = [
     # Основные маршруты API

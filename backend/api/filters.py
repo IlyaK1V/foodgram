@@ -2,6 +2,7 @@ import django_filters
 from django_filters import rest_framework as filters
 from django_filters.widgets import BooleanWidget
 
+from .utils import boolean_filter
 from recipes.models import Recipe
 
 
@@ -36,19 +37,21 @@ class RecipeFilter(filters.FilterSet):
         fields = ('author', 'tags', 'is_favorited', 'is_in_shopping_cart')
 
     def filter_is_favorited(self, queryset, name, value):
-        # value здесь будет уже булевым True или False
-        user = self.request.user
-        if not user.is_authenticated:
-            return queryset.none()
-        if value:
-            return queryset.filter(favorited_by__user=user)
-        return queryset.exclude(favorited_by__user=user)
+        # user = self.request.user
+        # if not user.is_authenticated:
+        #     return queryset.none()
+        # if value:
+        #     return queryset.filter(favorited_by__user=user)
+        # return queryset.exclude(favorited_by__user=user)
+        return boolean_filter(self, queryset, name, value,
+                              filter_field='favorited_by__user')
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
-        # value здесь будет уже булевым True или False
-        user = self.request.user
-        if not user.is_authenticated:
-            return queryset.none()
-        if value:
-            return queryset.filter(shopping_cart__user=user)
-        return queryset.exclude(shopping_cart__user=user)
+        # user = self.request.user
+        # if not user.is_authenticated:
+        #     return queryset.none()
+        # if value:
+        #     return queryset.filter(shopping_cart__user=user)
+        # return queryset.exclude(shopping_cart__user=user)
+        return boolean_filter(self, queryset, name, value,
+                              filter_field='shopping_cart__user')

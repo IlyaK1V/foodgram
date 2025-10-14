@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Sum
 from django.http import HttpResponse
 from rest_framework import status
-from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet, ViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import (IsAuthenticated, AllowAny,
@@ -32,7 +32,7 @@ from .serializers import (
     RecipeCreateSerializer,
 )
 from .permissions import IsAuthorOrReadOnly
-from .utils import toggle_relation
+from .utils import recipe_toggle_relations
 
 
 class TagViewSet(ReadOnlyModelViewSet):
@@ -80,7 +80,7 @@ class RecipeViewSet(ModelViewSet):
     @action(detail=True, methods=['post', 'delete'])
     def favorite(self, request, pk=None):
 
-        return toggle_relation(
+        return recipe_toggle_relations(
             request=request,
             pk=pk,
             recipe_model=Recipe,
@@ -93,7 +93,7 @@ class RecipeViewSet(ModelViewSet):
     @action(detail=True, methods=['post', 'delete'])
     def shopping_cart(self, request, pk=None):
 
-        return toggle_relation(
+        return recipe_toggle_relations(
             request=request,
             pk=pk,
             recipe_model=Recipe,
@@ -141,6 +141,29 @@ class RecipeViewSet(ModelViewSet):
         response['Content-Disposition'] = 'attachment; ' \
             'filename="shopping_list.txt"'
         return response
+
+
+class ShortLinkViewSet(ViewSet):
+    """
+    Обработка коротких ссылок.
+    Пример: /api/s/MQ/
+    """
+
+    def retrieve(self, request, pk=None):
+        try:
+            # Восстанавливаем ID рецепта
+            padded_id = pk + '=' * (-len(pk) % 4)
+            decoded_id = base64.urlsafe_b64decode(padded_id.encode()).decode()
+            recipe_id = int(decoded_id)
+        except (ValueError, base64.binascii.Error):
+            return Response(
+                {'error': 'Некорректная короткая ссылка.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        recipe = get_object_or_404(Recipe, pk=recipe_id)
+        serializer = RecipeListSerializer(recipe, context={'request': request})
+        return Response(serializer.data)
 
 
 class UserViewSet(ModelViewSet):

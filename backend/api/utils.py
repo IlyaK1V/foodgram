@@ -6,7 +6,7 @@ from .serializers import RecipeMinifiedSerializer
 from recipes.models import Recipe
 
 
-def toggle_relation(
+def recipe_toggle_relations(
         request,
         pk=None,
         recipe_model=Recipe,
@@ -37,3 +37,15 @@ def toggle_relation(
         )
     item.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+def boolean_filter(self, queryset, name, value, filter_field):
+    user = self.request.user
+    if not user.is_authenticated:
+        return queryset.none()
+
+    filter_kwargs = {filter_field: user}
+
+    if value:
+        return queryset.filter(**filter_kwargs)
+    return queryset.exclude(**filter_kwargs)
