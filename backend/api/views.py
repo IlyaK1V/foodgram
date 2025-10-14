@@ -30,39 +30,9 @@ from .serializers import (
     IngredientSerializer,
     RecipeListSerializer,
     RecipeCreateSerializer,
-    RecipeMinifiedSerializer,
 )
 from .permissions import IsAuthorOrReadOnly
-
-
-def toggle_relation(
-        request,
-        recipe=None,
-        model=None,
-        existing_error_message=None,
-        non_existing_error_message=None,):
-
-    if request.method == 'POST':
-        # Проверяем — уже добавлен ли рецепт
-        if model.objects.filter(user=request.user,
-                                recipe=recipe).exists():
-            return Response(
-                existing_error_message,
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        model.objects.create(user=request.user, recipe=recipe)
-        serializer = RecipeMinifiedSerializer(recipe)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    item = model.objects.filter(
-        user=request.user, recipe=recipe)
-    if not item.exists():
-        return Response(
-            non_existing_error_message,
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    item.delete()
-    return Response(status=status.HTTP_204_NO_CONTENT)
+from .utils import toggle_relation
 
 
 class TagViewSet(ReadOnlyModelViewSet):
@@ -109,11 +79,11 @@ class RecipeViewSet(ModelViewSet):
 
     @action(detail=True, methods=['post', 'delete'])
     def favorite(self, request, pk=None):
-        recipe = get_object_or_404(Recipe, id=pk)
 
         return toggle_relation(
             request=request,
-            recipe=recipe,
+            pk=pk,
+            recipe_model=Recipe,
             model=Favorite,
             existing_error_message={
                 'errors': 'Рецепт уже добавлен в избранное.'},
@@ -122,11 +92,11 @@ class RecipeViewSet(ModelViewSet):
 
     @action(detail=True, methods=['post', 'delete'])
     def shopping_cart(self, request, pk=None):
-        recipe = get_object_or_404(Recipe, id=pk)
 
         return toggle_relation(
             request=request,
-            recipe=recipe,
+            pk=pk,
+            recipe_model=Recipe,
             model=ShoppingCart,
             existing_error_message={'errors': 'Рецепт уже в списке покупок.'},
             non_existing_error_message={'errors': 'Рецепта нет в списке '
@@ -186,7 +156,7 @@ class UserViewSet(ModelViewSet):
     @action(detail=False, methods=['get'],
             permission_classes=(IsAuthenticated,))
     def me(self, request):
-        """Текущий пользователь (GET /users/me/)."""
+        """Текущий пользователь."""
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
 

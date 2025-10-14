@@ -1,6 +1,7 @@
 volumes:
   pg_data_foodgram:
   static_foodgram:
+  media_foodgram:
 
 services:
   db:
@@ -13,6 +14,7 @@ services:
     env_file: .env
     volumes:
       - static_foodgram:/backend_static
+      - media_foodgram:/app/media
   frontend:
     build: ./frontend/
     env_file: .env
@@ -24,5 +26,6 @@ services:
     env_file: .env
     volumes:
       - static_foodgram:/staticfiles/
+      - media_foodgram:/staticfiles/media
     ports:
       - "${EXTERNAL_PORT}:80"

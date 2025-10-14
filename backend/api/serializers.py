@@ -150,9 +150,11 @@ class RecipeListSerializer(serializers.ModelSerializer):
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
     ingredients = IngredientWriteSerializer(many=True)
-    tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(),
-                                              many=True)
-    image = Base64ImageField()
+    tags = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(),
+        many=True
+    )
+    image = Base64ImageField(required=False, allow_null=True)
 
     class Meta:
         model = Recipe
@@ -166,39 +168,36 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         )
         validators = (validate_recipe,)
 
+    def validate(self, data):
+        data['request'] = self.context.get('request')
+        return validate_recipe(data)
+
     def to_representation(self, instance):
+        """
+        После создания/обновления возвращаем полное представление рецепта.
+        """
         return RecipeListSerializer(instance, context=self.context).data
 
-    def get_or_create_ingredients(self, ingredients_data, recipe):
-        """Создать или получить ингредиенты и добавить их к рецепту."""
-
+    def add_ingredients(self, ingredients_data, recipe):
+        """Добавить ингредиенты к рецепту (только если они существуют)."""
         for item in ingredients_data:
+            ingredient_id = item.get('id')
             amount = item.get('amount')
 
+            if not ingredient_id:
+                raise serializers.ValidationError(
+                    "Каждый ингредиент должен содержать поле 'id'."
+                )
             if amount is None:
                 raise serializers.ValidationError(
                     "Каждый ингредиент должен содержать поле 'amount'."
                 )
 
-            ingredient = None
-
-            if item.get('id'):
-                try:
-                    ingredient = Ingredient.objects.get(id=item['id'])
-                except Ingredient.DoesNotExist:
-                    raise serializers.ValidationError(
-                        f"Ингредиент с id={item['id']} не найден."
-                    )
-
-            elif item.get('name'):
-                ingredient, _ = Ingredient.objects.get_or_create(
-                    name=item['name'],
-                    defaults={'measurement_unit': 'шт.'}
-                )
-
-            else:
+            try:
+                ingredient = Ingredient.objects.get(id=ingredient_id)
+            except Ingredient.DoesNotExist:
                 raise serializers.ValidationError(
-                    "Ингредиент должен содержать 'id' или 'name'."
+                    f"Ингредиент с id={ingredient_id} не найден."
                 )
 
             IngredientAmount.objects.create(
@@ -208,27 +207,44 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             )
 
     def create(self, validated_data):
+        """Создание рецепта с ингредиентами и тегами."""
         ingredients_data = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
+
+        validated_data.pop('request', None)
 
         recipe = Recipe.objects.create(
             author=self.context['request'].user,
             **validated_data
         )
         recipe.tags.set(tags)
-        self.get_or_create_ingredients(ingredients_data, recipe)
+        self.add_ingredients(ingredients_data, recipe)
         return recipe
 
     def update(self, instance, validated_data):
+        """
+        Обновление рецепта без создания изображения, если не передано новое.
+        """
         ingredients_data = validated_data.pop('ingredients', [])
         tags = validated_data.pop('tags', [])
+        image = validated_data.pop('image', None)
 
-        instance.tags.set(tags)
-        instance.ingredient_amounts.all().delete()
-        self.get_or_create_ingredients(ingredients_data, instance)
+        if image:
+            instance.image = image
 
+        # Обновляем теги
+        if tags:
+            instance.tags.set(tags)
+
+        # Обновляем ингредиенты (очищаем и добавляем заново)
+        if ingredients_data:
+            instance.ingredient_amounts.all().delete()
+            self.add_ingredients(ingredients_data, instance)
+
+        # Обновляем остальные поля
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+
         instance.save()
         return instance
 

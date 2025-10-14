@@ -34,19 +34,25 @@ def validate_recipe(data):
     ingredients = data.get('ingredients', [])
     tags = data.get('tags', [])
     image = data.get('image')
+    request = data.get('request')
+    method = getattr(request, 'method', None)
 
-    if not image:
-        raise serializers.ValidationError(
-            {'ingredients': 'Нужно добавить изображение рецепта.'}
-        )
+    if method == 'POST' and not image:
+        raise serializers.ValidationError({
+            'image': ['Нужно добавить изображение рецепта.']
+        })
+    if method == 'PATCH' and image in [None, '']:
+        raise serializers.ValidationError({
+            'image': ['Нельзя отправлять пустое поле изображения.']
+        })
 
-    # Проверка, что хотя бы один ингредиент
+    # Проверка, указан что хотя бы один ингредиент
     if not ingredients:
         raise serializers.ValidationError(
             {'ingredients': 'Нужно добавить хотя бы один ингредиент.'}
         )
 
-    # Проверка, что хотя бы один тег
+    # Проверка, что указан хотя бы один тег
     if not tags:
         raise serializers.ValidationError(
             {'tags': 'Нужно указать хотя бы один тег.'}
