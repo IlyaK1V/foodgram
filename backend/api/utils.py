@@ -6,7 +6,7 @@ from .serializers import RecipeMinifiedSerializer
 from recipes.models import Recipe
 
 
-def recipe_toggle_relations(
+def recipe_add(
         request,
         pk=None,
         recipe_model=Recipe,

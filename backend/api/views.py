@@ -32,7 +32,7 @@ from .serializers import (
     RecipeCreateSerializer,
 )
 from .permissions import IsAuthorOrReadOnly
-from .utils import recipe_toggle_relations
+from .utils import recipe_add
 
 
 class TagViewSet(ReadOnlyModelViewSet):
@@ -80,7 +80,7 @@ class RecipeViewSet(ModelViewSet):
     @action(detail=True, methods=['post', 'delete'])
     def favorite(self, request, pk=None):
 
-        return recipe_toggle_relations(
+        return recipe_add(
             request=request,
             pk=pk,
             recipe_model=Recipe,
@@ -93,7 +93,7 @@ class RecipeViewSet(ModelViewSet):
     @action(detail=True, methods=['post', 'delete'])
     def shopping_cart(self, request, pk=None):
 
-        return recipe_toggle_relations(
+        return recipe_add(
             request=request,
             pk=pk,
             recipe_model=Recipe,

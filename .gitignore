@@ -140,3 +140,5 @@ dmypy.json
 
 static/
 media/
+
+show_tree.py
