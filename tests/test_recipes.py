@@ -72,6 +72,36 @@ class TestRecipes:
             'должен создать рецепт в БД'
         )
 
+    def test_create_recipe_with_non_existing_ingredient(
+        self,
+        auth_client,
+        no_auth_client,
+        tag,
+        ingredient
+    ):
+        data = {
+            "ingredients": [{"id": 99999, "amount": 25}],
+            "tags": [tag.id],
+            "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAg"
+            "MAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4"
+            "bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+            "name": "Рецепт с несуществующим ингредиентом",
+            "text": "Админ, добавь ингредиент!",
+            "cooking_time": 15
+        }
+
+        response = auth_client.post(self.RECIPES_LIST_URL, data=data,
+                                    format='json')
+        assert response.status_code == HTTPStatus.BAD_REQUEST, (
+            'Запрос авторизованного пользователя на создание рецепта '
+            'с несуществующим ингредиентом должен вернуть ответ '
+            f'со статус-кодом {HTTPStatus.BAD_REQUEST}'
+        )
+        assert not Recipe.objects.filter(name=data['name']).exists(), (
+            'Запрос авторизованного пользователя на создание рецепта '
+            'с несуществующим ингредиентом не должен создать рецепт в БД'
+        )
+
     def test_delete_recipe(self, auth_client, no_auth_client, recipe,
                            recipe_url):
         response = no_auth_client.delete(recipe_url)

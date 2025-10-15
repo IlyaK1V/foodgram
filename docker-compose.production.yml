@@ -8,6 +8,8 @@ services:
     env_file: .env
     volumes:
       - pg_data_foodgram:/var/lib/postgresql/data
+    ports:
+    - ${POSTGRES_EXTERNAL_PORT}:5432"
   backend:
     image: ilyak475/foodgram_backend
     env_file: .env

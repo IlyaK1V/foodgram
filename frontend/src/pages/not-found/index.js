@@ -3,7 +3,7 @@ import styles from "./styles.module.css";
 import image from "../../images/not-found.png";
 import { useHistory } from "react-router-dom";
 
-const Favorites = () => {
+const NotFound = () => {
   const history = useHistory();
 
   const handleClick = () => history.replace("/recipes");
@@ -25,4 +25,4 @@ const Favorites = () => {
   );
 };
 
-export default Favorites;
+export default NotFound;

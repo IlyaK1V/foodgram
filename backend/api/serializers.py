@@ -172,6 +172,21 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         data['request'] = self.context.get('request')
         return validate_recipe(data)
 
+    def validate_ingredients_exist(self, ingredients_data):
+        """Проверяет, что все ингредиенты существуют."""
+        for item in ingredients_data:
+            ingredient_id = item.get('id')
+            if not ingredient_id:
+                raise serializers.ValidationError({
+                    'ingredients': 'Каждый ингредиент должен содержать '
+                    'поле "id".'
+                })
+            if not Ingredient.objects.filter(id=ingredient_id).exists():
+                raise serializers.ValidationError({
+                    'ingredients': f'Ингредиент с id={ingredient_id} '
+                    'не найден.'
+                })
+
     def to_representation(self, instance):
         """
         После создания/обновления возвращаем полное представление рецепта.
@@ -209,6 +224,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """Создание рецепта с ингредиентами и тегами."""
         ingredients_data = validated_data.pop('ingredients')
+        self.validate_ingredients_exist(ingredients_data)
         tags = validated_data.pop('tags')
 
         validated_data.pop('request', None)
