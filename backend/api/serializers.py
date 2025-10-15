@@ -1,23 +1,13 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import MaxLengthValidator
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
-from django.core.validators import MaxLengthValidator
 
-from recipes.constants import USERNAME_MAX_LENGTH, EMAIL_MAX_LENGTH
-from recipes.models import (
-    Ingredient,
-    IngredientAmount,
-    Favorite,
-    Follow,
-    ShoppingCart,
-    Tag,
-    Recipe,
-)
-from recipes.validators import (
-    CustomUniqueValidator,
-    validate_username,
-    validate_recipe,
-)
+from recipes.constants import EMAIL_MAX_LENGTH, USERNAME_MAX_LENGTH
+from recipes.models import (Favorite, Follow, Ingredient, IngredientAmount,
+                            Recipe, ShoppingCart, Tag)
+from recipes.validators import (CustomUniqueValidator, validate_recipe,
+                                validate_username)
 
 User = get_user_model()
 

@@ -1,9 +1,9 @@
 import django_filters
 from django_filters import rest_framework as filters
 from django_filters.widgets import BooleanWidget
+from recipes.models import Recipe
 
 from .utils import boolean_filter
-from recipes.models import Recipe
 
 
 class CustomBooleanFilter(filters.BooleanFilter):

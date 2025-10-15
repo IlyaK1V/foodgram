@@ -1,4 +1,5 @@
 from http import HTTPStatus
+
 import pytest
 
 from recipes.models import Ingredient

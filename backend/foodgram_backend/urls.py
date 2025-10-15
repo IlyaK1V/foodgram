@@ -1,7 +1,8 @@
 import base64
+
 from django.contrib import admin
-from django.urls import include, path, re_path
 from django.shortcuts import redirect
+from django.urls import include, path, re_path
 
 
 def short_link_redirect(request, encoded_id):

@@ -1,9 +1,9 @@
 from django.shortcuts import get_object_or_404
+from recipes.models import Recipe
 from rest_framework import status
 from rest_framework.response import Response
 
 from .serializers import RecipeMinifiedSerializer
-from recipes.models import Recipe
 
 
 def recipe_add(

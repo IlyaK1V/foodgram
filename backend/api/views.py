@@ -1,36 +1,23 @@
 import base64
-from django_filters.rest_framework import DjangoFilterBackend
-from django.shortcuts import get_object_or_404
+
 from django.db.models import Sum
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
-from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet, ViewSet
 from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.permissions import (IsAuthenticated, AllowAny,
+from rest_framework.permissions import (AllowAny, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet, ViewSet
 
+from recipes.models import (Favorite, Follow, Ingredient, IngredientAmount,
+                            Recipe, ShoppingCart, Tag, User)
 from .filters import RecipeFilter
-from recipes.models import (
-    User,
-    Tag,
-    Ingredient,
-    IngredientAmount,
-    Recipe,
-    Favorite,
-    ShoppingCart,
-    Follow,
-)
-from .serializers import (
-    FollowSerializer,
-    UserSerializer,
-    UserCreateSerializer,
-    TagSerializer,
-    IngredientSerializer,
-    RecipeListSerializer,
-    RecipeCreateSerializer,
-)
 from .permissions import IsAuthorOrReadOnly
+from .serializers import (FollowSerializer, IngredientSerializer,
+                          RecipeCreateSerializer, RecipeListSerializer,
+                          TagSerializer, UserCreateSerializer, UserSerializer)
 from .utils import recipe_add
 
 
