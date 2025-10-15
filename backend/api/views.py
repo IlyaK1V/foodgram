@@ -4,6 +4,8 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from recipes.models import (Favorite, Follow, Ingredient, IngredientAmount,
+                            Recipe, ShoppingCart, Tag, User)
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import (AllowAny, IsAuthenticated,
@@ -11,8 +13,6 @@ from rest_framework.permissions import (AllowAny, IsAuthenticated,
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet, ViewSet
 
-from recipes.models import (Favorite, Follow, Ingredient, IngredientAmount,
-                            Recipe, ShoppingCart, Tag, User)
 from .filters import RecipeFilter
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (FollowSerializer, IngredientSerializer,
