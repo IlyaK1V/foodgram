@@ -1,1 +1,30 @@
-с
+volumes:
+  pg_data_foodgram:
+  static_foodgram:
+
+services:
+  db:
+    image: postgres:13
+    env_file: .env
+    volumes:
+      - pg_data_foodgram:/var/lib/postgresql/data
+    ports:
+    - "${POSTGRES_EXTERNAL_PORT}:5432"
+  backend:
+    image: ilyak475/foodgram_backend
+    env_file: .env
+    volumes:
+      - static_foodgram:/backend_static
+  frontend:
+    image: ilyak475/foodgram_frontend
+    env_file: .env
+    command: cp -r /app/build/. /frontend_static/
+    volumes:
+      - static_foodgram:/frontend_static
+  gateway:
+    image: ilyak475/foodgram_gateway
+    env_file: .env
+    volumes:
+      - static_foodgram:/staticfiles/
+    ports:
+      - "${EXTERNAL_PORT}:80"
