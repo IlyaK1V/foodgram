@@ -18,7 +18,7 @@ services:
   frontend:
     image: ilyak475/foodgram_frontend
     env_file: .env
-    command: sh -c "cp -r /app/build/. /frontend_static/ && tail -f /dev/null"
+    command: cp -r /app/build/. /frontend_static/
     volumes:
       - static_foodgram:/frontend_static
   gateway:
