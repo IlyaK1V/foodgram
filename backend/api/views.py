@@ -1,5 +1,4 @@
 import base64
-from django.core.paginator import Paginator
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from django.db.models import Sum
@@ -212,18 +211,16 @@ class UserViewSet(ModelViewSet):
     def subscriptions(self, request):
         """Вывод всех авторов, на которых подписан текущий пользователь."""
         follows = User.objects.filter(following__user=request.user)
-        paginator = Paginator(follows, 10)
-        page_number = request.query_params.get('page')
-        page = paginator.get_page(page_number)
+        page = self.paginate_queryset(follows)
+        if page is not None:
+            serializer = FollowSerializer(
+                page, many=True, context={'request': request})
+            return self.get_paginated_response(serializer.data)
+
+        # Если пагинация отключена — просто возвращаем всё
         serializer = FollowSerializer(
-            page, many=True, context={'request': request})
-        return Response({
-            'count': paginator.count,
-            'next': page.next_page_number() if page.has_next() else None,
-            'previous': (page.previous_page_number() if page.has_previous()
-                         else None),
-            'results': serializer.data
-        })
+            follows, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=(IsAuthenticated,))
