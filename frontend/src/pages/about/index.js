@@ -3,14 +3,14 @@ import styles from './styles.module.css'
 import MetaTags from 'react-meta-tags'
 
 const About = () => {
-
+  
   return <Main>
     <MetaTags>
       <title>О проекте</title>
       <meta name="description" content="Фудграм - О проекте" />
       <meta property="og:title" content="О проекте" />
     </MetaTags>
-
+    
     <Container>
       <h1 className={styles.title}>Привет!</h1>
       <div className={styles.content}>
@@ -25,7 +25,7 @@ const About = () => {
               приготовления блюда, просмотреть рецепты друзей и добавить любимые рецепты в список избранных.
             </p>
             <p className={styles.textItem}>
-              Чтобы использовать все возможности сайта — нужна регистрация. Проверка адреса электронной почты не осуществляется, вы можете ввести любой email.
+              Чтобы использовать все возможности сайта — нужна регистрация. Проверка адреса электронной почты не осуществляется, вы можете ввести любой email. 
             </p>
             <p className={styles.textItem}>
               Заходите и делитесь своими любимыми рецептами!
@@ -46,7 +46,7 @@ const About = () => {
           </div>
         </aside>
       </div>
-
+      
     </Container>
   </Main>
 }

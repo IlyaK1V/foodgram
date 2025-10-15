@@ -22,7 +22,7 @@ services:
     volumes:
       - static_foodgram:/frontend_static
   gateway:
-    build: ./foodgram_gateway/
+    build: ./nginx/
     env_file: .env
     volumes:
       - static_foodgram:/staticfiles/
