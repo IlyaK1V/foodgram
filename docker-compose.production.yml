@@ -30,5 +30,6 @@ services:
     env_file: .env
     volumes:
       - static_foodgram:/staticfiles/
+      - media_foodgram:/media/
     ports:
       - "${EXTERNAL_PORT}:80"
