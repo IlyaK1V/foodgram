@@ -15,6 +15,7 @@ services:
     env_file: .env
     volumes:
       - static_foodgram:/backend_static
+      - media_foodgram:/app/media
   frontend:
     image: ilyak475/foodgram_frontend
     env_file: .env

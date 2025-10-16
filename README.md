@@ -81,6 +81,12 @@ docker compose -f docker-compose.production.yml exec backend python manage.py mi
 docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic
 ```
 
+## Тестирование
+Для локального запуска тестов backend используйте команду
+```
+PYTEST=1 pytest
+```
+
 ## CI/CD
 
 Проект настроен на автоматическую сборку и деплой через GitHub Actions:
