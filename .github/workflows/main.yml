@@ -103,7 +103,7 @@ jobs:
           context: ./nginx/
           push: true
           tags: ilyak475/foodgram_gateway:latest
-
+ 
   deploy:
     runs-on: ubuntu-latest
     needs:
