@@ -58,6 +58,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram_backend.wsgi.application'
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://foodgram-learning.ru',
+    'http://foodgram-learning.ru',
+    'https://www.foodgram-learning.ru',
+]
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
