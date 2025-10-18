@@ -3,9 +3,15 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.validators import MinValueValidator
 from django.db import models
 
-from .constants import (EMAIL_MAX_LENGTH, INGRIDIENT_MAX_LENGTH,
-                        MEASURMENT_UNIT_MAX_LENGTH, MIN_VALUE,
-                        RECIPE_MAX_LENGTH, TAG_MAX_LENGTH, USERNAME_MAX_LENGTH)
+from .constants import (
+    EMAIL_MAX_LENGTH,
+    INGRIDIENT_MAX_LENGTH,
+    MEASURMENT_UNIT_MAX_LENGTH,
+    MIN_VALUE,
+    RECIPE_MAX_LENGTH,
+    TAG_MAX_LENGTH,
+    USERNAME_MAX_LENGTH,
+)
 from .validators import validate_username
 
 

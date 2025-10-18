@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 import pytest
+
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -116,9 +117,14 @@ class TestAuthAndRegistration:
             'username': 'user1',
             'first_name': 'A',
             'last_name': 'B',
-            'password': '12345qwerty',
+            'password': 'strongpassword123',
         }
-        no_auth_client.post(self.USERS_URL, data=data)
+        response = no_auth_client.post(self.USERS_URL, data=data)
+        assert response.status_code == HTTPStatus.CREATED, (
+            'Убедитесь, что запроc на регистрацию нового пользователя, '
+            'содержащий корректные данные, возвращает ответ со '
+            f'статус-кодом {HTTPStatus.CREATED}'
+        )
         user = User.objects.filter(username=data['username'])
         assert user.exists(), (
             'Убедитесь что пользователь с корректными данными создаётся в БД')
@@ -177,12 +183,12 @@ class TestAuthAndRegistration:
     def test_set_password(self, auth_client):
         """Проверка смены пароля через set_password"""
         data = {
-            'new_password': 'newpass12345',
-            'current_password': 'testpassword'
+            'new_password': 'newpass125!!',
+            'current_password': 'testpassword',
         }
         response = auth_client.post(self.SET_PASSWORD_URL, data=data)
         assert response.status_code == HTTPStatus.NO_CONTENT, (
-            'Убедитесь, что при смене пароля'
+            'Убедитесь, что при смене пароля '
             f'возращается ответ со статусом {HTTPStatus.NO_CONTENT}'
         )
 
