@@ -39,7 +39,7 @@ class TestIngredients:
     def test_create_ingredients(self, no_auth_client, auth_client, ingredient):
         data = {
             'name': 'Совершенно невнятный ингредиент',
-            'measurement_unit': 'гр'
+            'measurement_unit': 'гр',
         }
         response = no_auth_client.post(self.INGREDIENTS_LIST_URL, data)
         assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED, (
@@ -63,8 +63,10 @@ class TestIngredients:
             'ингредиент в БД'
         )
 
-    def test_delete_ingredients(self, no_auth_client, auth_client, ingredient,
-                                ingredient_url):
+    def test_delete_ingredients(
+        self, no_auth_client, auth_client, ingredient,
+        ingredient_url,
+    ):
         response = no_auth_client.delete(ingredient_url)
         assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED, (
             'Запрос неавторизованного пользователя на удаление ингредиента'
@@ -87,11 +89,13 @@ class TestIngredients:
             'ингредиент в БД'
         )
 
-    def test_update_ingredients(self, no_auth_client, auth_client, ingredient,
-                                ingredient_url):
+    def test_update_ingredients(
+        self, no_auth_client, auth_client, ingredient,
+        ingredient_url,
+    ):
         data = {
             'name': 'Хрен',
-            'measurement_unit': 'гр'
+            'measurement_unit': 'гр',
         }
         response = no_auth_client.put(ingredient_url, data)
         assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED, (
@@ -115,10 +119,12 @@ class TestIngredients:
             'не должен менять изгредиент в БД'
         )
 
-    def test_partial_update_ingredients(self, no_auth_client, auth_client,
-                                        ingredient, ingredient_url):
+    def test_partial_update_ingredients(
+        self, no_auth_client, auth_client,
+        ingredient, ingredient_url,
+    ):
         data = {
-            'measurement_unit': 'гр'
+            'measurement_unit': 'гр',
         }
         response = no_auth_client.patch(ingredient_url, data)
         assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED, (
@@ -127,7 +133,8 @@ class TestIngredients:
             f'со статус-кодом {HTTPStatus.METHOD_NOT_ALLOWED}'
         )
         assert not Ingredient.objects.filter(
-            measurement_unit=data['measurement_unit']), (
+            measurement_unit=data['measurement_unit'],
+        ), (
             'PATCH запрос авторизованного пользователя на изменение '
             'ингредиента не должен менять изгредиент в БД'
         )
@@ -139,7 +146,8 @@ class TestIngredients:
             f'со статус-кодом {HTTPStatus.METHOD_NOT_ALLOWED}'
         )
         assert not Ingredient.objects.filter(
-            measurement_unit=data['measurement_unit']), (
+            measurement_unit=data['measurement_unit'],
+        ), (
             'PATCH запрос авторизованного пользователя на изменение '
             'ингредиента не должен менять изгредиент в БД'
         )

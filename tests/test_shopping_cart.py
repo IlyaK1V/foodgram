@@ -84,7 +84,9 @@ class TestShoppingCart:
             'существующего рецепта из корзины должен удалять корзину из БД'
         )
 
-    def test_download_shopping_cart(self, auth_client, shopping_cart,
-                                    download_shopping_cart_url):
+    def test_download_shopping_cart(
+        self, auth_client, shopping_cart,
+        download_shopping_cart_url,
+    ):
         response = auth_client.get(download_shopping_cart_url)
         assert response.status_code == HTTPStatus.OK

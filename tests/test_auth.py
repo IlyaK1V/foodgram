@@ -109,8 +109,10 @@ class TestAuthAndRegistration:
             'содержащий корректные данные, не сохраняется в БД'
         )
 
-    def test_registration_with_duplicate_email_or_username(self,
-                                                           no_auth_client):
+    def test_registration_with_duplicate_email_or_username(
+        self,
+        no_auth_client,
+    ):
         """Повторная регистрация с тем же email или username"""
         data = {
             'email': 'sup@example.com',
@@ -127,12 +129,15 @@ class TestAuthAndRegistration:
         )
         user = User.objects.filter(username=data['username'])
         assert user.exists(), (
-            'Убедитесь что пользователь с корректными данными создаётся в БД')
+            'Убедитесь что пользователь с корректными данными создаётся в БД'
+        )
         new_username = 'anotheruser'
-        response = no_auth_client.post(self.USERS_URL, data={
-            **data,
-            'username': new_username,
-        })
+        response = no_auth_client.post(
+            self.USERS_URL, data={
+                **data,
+                'username': new_username,
+            },
+        )
         assert response.status_code == HTTPStatus.BAD_REQUEST, (
             'Если при регистрации нового пользователя в запрос передан `email`'
             ' зарегистрированного пользователя - должен вернуться ответ '
@@ -144,10 +149,12 @@ class TestAuthAndRegistration:
             'содержащий существующий email, не сохраняется в БД'
         )
         new_email = 'anotheruser@example.com'
-        response = no_auth_client.post(self.USERS_URL, data={
-            **data,
-            'email': new_email,
-        })
+        response = no_auth_client.post(
+            self.USERS_URL, data={
+                **data,
+                'email': new_email,
+            },
+        )
         assert response.status_code == HTTPStatus.BAD_REQUEST, (
             'Если при регистрации нового пользователя в запрос передан '
             '`username` зарегистрированного пользователя - должен '

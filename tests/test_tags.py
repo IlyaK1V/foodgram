@@ -38,8 +38,10 @@ class TestTags:
             f'со статус-кодом {HTTPStatus.OK}'
         )
 
-    def test_create_delete_update_tags(self, no_auth_client, auth_client, tag,
-                                       tag_url):
+    def test_create_delete_update_tags(
+        self, no_auth_client, auth_client, tag,
+        tag_url,
+    ):
         """Тестируем создание, обновление и удаление тега"""
 
         data = {'name': 'Новый тег', 'slug': 'new_tag'}

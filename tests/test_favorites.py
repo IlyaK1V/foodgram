@@ -33,8 +33,10 @@ class TestFavorites:
             'избранного должен вернуть ответ '
             f'со статус-кодом {HTTPStatus.NO_CONTENT}'
         )
-        assert not Favorite.objects.filter(user=user,
-                                           recipe=recipe).exists(), (
+        assert not Favorite.objects.filter(
+            user=user,
+            recipe=recipe,
+        ).exists(), (
             'После DELETE-запроса в избранном не должно быть записи для этого '
             'пользователя и рецепта.'
         )
@@ -53,13 +55,17 @@ class TestFavorites:
             'избранное должен вернуть ответ '
             f'со статус-кодом {HTTPStatus.UNAUTHORIZED}'
         )
-        assert not Favorite.objects.filter(user=user,
-                                           recipe=recipe).exists(), (
+        assert not Favorite.objects.filter(
+            user=user,
+            recipe=recipe,
+        ).exists(), (
             'После POST запроса неавторизованного пользователя в избранном не '
             f'должно быть записи для пользователя {user} и рецепта.'
         )
-        assert not Favorite.objects.filter(user=another_user,
-                                           recipe=recipe).exists(), (
+        assert not Favorite.objects.filter(
+            user=another_user,
+            recipe=recipe,
+        ).exists(), (
             'После POST запроса неавторизованного пользователя в избранном не '
             f'должно быть записи для пользователя {another_user} и рецепта.'
         )
@@ -70,14 +76,18 @@ class TestFavorites:
             'избранного должен вернуть ответ '
             f'со статус-кодом {HTTPStatus.UNAUTHORIZED}'
         )
-        assert not Favorite.objects.filter(user=user,
-                                           recipe=recipe).exists(), (
+        assert not Favorite.objects.filter(
+            user=user,
+            recipe=recipe,
+        ).exists(), (
             'После DELETE запроса неавторизованного пользователя '
             'в избранном не '
             f'должно быть записи для пользователя {user} и рецепта.'
         )
-        assert not Favorite.objects.filter(user=another_user,
-                                           recipe=recipe).exists(), (
+        assert not Favorite.objects.filter(
+            user=another_user,
+            recipe=recipe,
+        ).exists(), (
             'После DELETE запроса неавторизованного пользователя '
             'в избранном не '
             f'должно быть записи для пользователя {another_user} и рецепта.'

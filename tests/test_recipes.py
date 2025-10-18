@@ -9,8 +9,10 @@ from recipes.models import Recipe
 class TestRecipes:
     RECIPES_LIST_URL = '/api/recipes/'
 
-    def test_get_recipes_list(self, no_auth_client, auth_client, recipe,
-                              recipe_get_link_url):
+    def test_get_recipes_list(
+        self, no_auth_client, auth_client, recipe,
+        recipe_get_link_url,
+    ):
         response = no_auth_client.get('/api/recipes/')
         assert response.status_code == HTTPStatus.OK, (
             'Запрос неавторизованного пользователя должен вернуть ответ '
@@ -23,8 +25,10 @@ class TestRecipes:
             f'со статус-кодом {HTTPStatus.OK}'
         )
 
-    def test_get_short_link(self, no_auth_client, auth_client, recipe,
-                            recipe_get_link_url):
+    def test_get_short_link(
+        self, no_auth_client, auth_client, recipe,
+        recipe_get_link_url,
+    ):
         response = no_auth_client.get(recipe_get_link_url)
         assert response.status_code == HTTPStatus.OK, (
             'Запрос неавторизованного пользователя должен вернуть ответ '
@@ -46,11 +50,12 @@ class TestRecipes:
             'bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==',
             'name': 'Омлет с сыром',
             'text': 'Просто вкусно',
-            'cooking_time': 5
+            'cooking_time': 5,
         }
 
         response = no_auth_client.post(
-            self.RECIPES_LIST_URL, data=data, format='json')
+            self.RECIPES_LIST_URL, data=data, format='json',
+        )
         assert response.status_code == HTTPStatus.UNAUTHORIZED, (
             'Запрос неавторизованного пользователя на создание рецепта'
             ' должен вернуть ответ '
@@ -61,8 +66,10 @@ class TestRecipes:
             'не должен создать рецепт в БД'
         )
 
-        response = auth_client.post(self.RECIPES_LIST_URL, data=data,
-                                    format='json')
+        response = auth_client.post(
+            self.RECIPES_LIST_URL, data=data,
+            format='json',
+        )
         assert response.status_code == HTTPStatus.CREATED, (
             'Запрос авторизованного пользователя на создание рецепта'
             ' должен вернуть ответ '
@@ -78,7 +85,7 @@ class TestRecipes:
         auth_client,
         no_auth_client,
         tag,
-        ingredient
+        ingredient,
     ):
         data = {
             "ingredients": [{"id": 99999, "amount": 25}],
@@ -88,11 +95,13 @@ class TestRecipes:
             "bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
             "name": "Рецепт с несуществующим ингредиентом",
             "text": "Админ, добавь ингредиент!",
-            "cooking_time": 15
+            "cooking_time": 15,
         }
 
-        response = auth_client.post(self.RECIPES_LIST_URL, data=data,
-                                    format='json')
+        response = auth_client.post(
+            self.RECIPES_LIST_URL, data=data,
+            format='json',
+        )
         assert response.status_code == HTTPStatus.BAD_REQUEST, (
             'Запрос авторизованного пользователя на создание рецепта '
             'с несуществующим ингредиентом должен вернуть ответ '
@@ -103,8 +112,10 @@ class TestRecipes:
             'с несуществующим ингредиентом не должен создать рецепт в БД'
         )
 
-    def test_delete_recipe(self, auth_client, no_auth_client, recipe,
-                           recipe_url):
+    def test_delete_recipe(
+        self, auth_client, no_auth_client, recipe,
+        recipe_url,
+    ):
         response = no_auth_client.delete(recipe_url)
         assert response.status_code == HTTPStatus.UNAUTHORIZED, (
             'Запрос неавторизованного пользователя на удаление '

@@ -33,8 +33,10 @@ class TestSubscribes:
             'подписки на другого пользователя должен вернуть ответ '
             f'со статус-кодом {HTTPStatus.CREATED}'
         )
-        assert Follow.objects.filter(user=user,
-                                     author=another_user).exists(), (
+        assert Follow.objects.filter(
+            user=user,
+            author=another_user,
+        ).exists(), (
             'После успешной подписки запись должна появиться в БД.'
         )
 
@@ -48,7 +50,8 @@ class TestSubscribes:
             'пользователем и автором.'
         )
         assert Follow.objects.filter(
-            user=user, author=another_user).count() == 1, (
+            user=user, author=another_user,
+        ).count() == 1, (
             'При попытке повторно подписаться на пользователя не создается '
             'идентичная запись в БД'
         )
@@ -59,33 +62,39 @@ class TestSubscribes:
             'друг на друга должен вернуть ответ '
             f'со статус-кодом {HTTPStatus.CREATED}'
         )
-        assert Follow.objects.filter(user=another_user,
-                                     author=user).exists(), (
+        assert Follow.objects.filter(
+            user=another_user,
+            author=user,
+        ).exists(), (
             'После успешной подписки друг на друга запись должна '
             'появиться в БД.'
         )
 
         response = auth_client.delete(
-            subscribe_another_user_url)
+            subscribe_another_user_url,
+        )
         assert response.status_code == HTTPStatus.NO_CONTENT, (
             'Запрос зарегистрированного пользователя на удаление подписки '
             'должен вернуться ответ '
             f'со статус-кодом {HTTPStatus.NO_CONTENT}'
         )
         assert not Follow.objects.filter(
-            user=user, author=another_user).exists(), (
+            user=user, author=another_user,
+        ).exists(), (
             'После удаления подписки запись должна появиться в БД.'
         )
 
         response = auth_client_another.delete(
-            subscribe_user_url)
+            subscribe_user_url,
+        )
         assert response.status_code == HTTPStatus.NO_CONTENT, (
             'Запрос зарегистрированного пользователя на удаление подписки '
             'друг на друга должен вернуться ответ '
             f'со статус-кодом {HTTPStatus.NO_CONTENT}'
         )
         assert not Follow.objects.filter(
-            user=another_user, author=user).exists(), (
+            user=another_user, author=user,
+        ).exists(), (
             'После удаления подписки друг на друга запись должна '
             'появиться в БД.'
         )
