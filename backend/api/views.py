@@ -74,12 +74,12 @@ class RecipeViewSet(ModelViewSet):
             queryset = queryset.annotate(
                 is_favorited=Exists(
                     Favorite.objects.filter(
-                    user=user, recipe=OuterRef('pk'),
+                        user=user, recipe=OuterRef('pk'),
                     ),
                 ),
                 is_in_shopping_cart=Exists(
                     ShoppingCart.objects.filter(
-                    user=user, recipe=OuterRef('pk'),
+                        user=user, recipe=OuterRef('pk'),
                     ),
                 ),
             )
@@ -191,7 +191,7 @@ class RecipeViewSet(ModelViewSet):
             FavoriteSerializer,
             existing_error_message={
                 'errors': (
-                'Рецепт уже добавлен в избранное.'
+                    'Рецепт уже добавлен в избранное.'
                 ),
             },
         )
@@ -230,7 +230,7 @@ class RecipeViewSet(ModelViewSet):
             request.user,
             non_existing_error_message={
                 'errors': (
-                'Рецепта нет в списке покупок.'
+                    'Рецепта нет в списке покупок.'
                 ),
             },
         )
