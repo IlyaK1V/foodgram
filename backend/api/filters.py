@@ -47,9 +47,9 @@ class RecipeFilter(filters.FilterSet):
         return queryset.exclude(**filter_kwargs)
 
     def filter_is_favorited(self, queryset, name, value):
-        return self._boolean_filter(self, queryset, name, value,
+        return self._boolean_filter(queryset, name, value,
                                     filter_field='favorited_by__user')
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
-        return self._boolean_filter(self, queryset, name, value,
+        return self._boolean_filter(queryset, name, value,
                                     filter_field='shopping_cart__user')
