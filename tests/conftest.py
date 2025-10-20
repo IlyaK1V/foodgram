@@ -4,4 +4,4 @@ pytest_plugins = [
     'tests.fixtures.ingredient',
     'tests.fixtures.recipe',
     'tests.fixtures.shopping_cart',
-]
+] 
