@@ -62,7 +62,7 @@ class IngredientAdmin(admin.ModelAdmin):
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     """Настройки админки для тегов."""
-    list_display = ('id', 'name', 'color', 'slug')
+    list_display = ('id', 'name', 'slug')
     search_fields = ('name', 'slug', 'color')
     ordering = ('name',)
     empty_value_display = '-пусто-'
