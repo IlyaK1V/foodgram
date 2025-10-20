@@ -55,7 +55,8 @@ class IngredientInRecipeSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='ingredient.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
-        source='ingredient.measurement_unit')
+        source='ingredient.measurement_unit',
+    )
 
     class Meta:
         model = IngredientAmount
@@ -68,18 +69,22 @@ class IngredientWriteSerializer(serializers.ModelSerializer):
         error_messages={
             'does_not_exist': 'Ингредиент с таким id не найден.',
             'incorrect_type': 'Некорректный тип значения для поля id.',
-        }
+        },
     )
     amount = serializers.IntegerField(
         min_value=MIN_INGREDIENT_AMOUNT,
         max_value=MAX_INGREDIENT_AMOUNT,
         error_messages={
-            'min_value': ('Количество ингредиента должно быть '
-                          f'не меньше {MIN_INGREDIENT_AMOUNT}.'),
-            'max_value': ('Количество ингредиента не может '
-                          f'превышать {MAX_INGREDIENT_AMOUNT}.'),
-            'invalid': 'Количество ингредиента должно быть целым числом.'
-        }
+            'min_value': (
+                'Количество ингредиента должно быть '
+                f'не меньше {MIN_INGREDIENT_AMOUNT}.'
+            ),
+            'max_value': (
+                'Количество ингредиента не может '
+                f'превышать {MAX_INGREDIENT_AMOUNT}.'
+            ),
+            'invalid': 'Количество ингредиента должно быть целым числом.',
+        },
     )
 
     class Meta:
@@ -140,7 +145,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         error_messages={
             'does_not_exist': 'Тег с таким id не найден.',
             'incorrect_type': 'Некорректный тип значения для поля tags.',
-        }
+        },
     )
     image = Base64ImageField(required=False, allow_null=True)
 
@@ -148,12 +153,16 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         min_value=MIN_COOKING_TIME,
         max_value=MAX_COOKING_TIME,
         error_messages={
-            'min_value': ('Время готовки не может быть '
-                          f'меньше {MIN_COOKING_TIME} мин.'),
-            'max_value': ('Время готовки не может '
-                          f'превышать {MAX_COOKING_TIME} мин.'),
+            'min_value': (
+                'Время готовки не может быть '
+                f'меньше {MIN_COOKING_TIME} мин.'
+            ),
+            'max_value': (
+                'Время готовки не может '
+                f'превышать {MAX_COOKING_TIME} мин.'
+            ),
             'invalid': 'Время готовки должно быть целым числом.',
-        }
+        },
     )
 
     class Meta:
@@ -172,7 +181,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         ingredients = data.get('ingredients')
         if not ingredients:
             raise serializers.ValidationError({
-                'ingredients': 'Необходимо указать хотя бы один ингредиент.'
+                'ingredients': 'Необходимо указать хотя бы один ингредиент.',
             })
 
         ingredient_ids = [item['id'] for item in ingredients]
@@ -251,8 +260,10 @@ class FollowSerializer(UserSerializer):
         limit = request.query_params.get('recipes_limit')
         if limit:
             recipes = recipes[:int(limit)]
-        return RecipeMinifiedSerializer(recipes, many=True,
-                                        context={'request': request}).data
+        return RecipeMinifiedSerializer(
+            recipes, many=True,
+            context={'request': request},
+        ).data
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()

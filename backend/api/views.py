@@ -67,15 +67,21 @@ class RecipeViewSet(ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         queryset = Recipe.objects.all().prefetch_related(
-            'tags', 'ingredient_amounts__ingredient', 'author'
+            'tags', 'ingredient_amounts__ingredient', 'author',
         )
 
         if user.is_authenticated:
             queryset = queryset.annotate(
-                is_favorited=Exists(Favorite.objects.filter(
-                    user=user, recipe=OuterRef('pk'))),
-                is_in_shopping_cart=Exists(ShoppingCart.objects.filter(
-                    user=user, recipe=OuterRef('pk'))),
+                is_favorited=Exists(
+                    Favorite.objects.filter(
+                    user=user, recipe=OuterRef('pk'),
+                    ),
+                ),
+                is_in_shopping_cart=Exists(
+                    ShoppingCart.objects.filter(
+                    user=user, recipe=OuterRef('pk'),
+                    ),
+                ),
             )
         else:
             queryset = queryset.annotate(
@@ -107,30 +113,38 @@ class RecipeViewSet(ModelViewSet):
             return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
         return item
 
-    def _add_recipe(self, request, recipe, model, serializer_class,
-                    existing_error_message):
+    def _add_recipe(
+        self, request, recipe, model, serializer_class,
+        existing_error_message,
+    ):
         """Общий метод для добавления рецепта (в избранное или корзину)."""
         user = request.user
 
         if model.objects.filter(user=user, recipe=recipe).exists():
-            return Response(existing_error_message,
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                existing_error_message,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         serializer = serializer_class(
             data={'user': user.id, 'recipe': recipe.id},
-            context={'request': request})
+            context={'request': request},
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
         return Response(
             RecipeMinifiedSerializer(
-                recipe, context={'request': request}).data,
-            status=status.HTTP_201_CREATED)
+                recipe, context={'request': request},
+            ).data,
+            status=status.HTTP_201_CREATED,
+        )
 
     def _remove_recipe(self, model, recipe, user, non_existing_error_message):
         """Общий метод для удаления рецепта (из избранного или корзины)."""
         item = self._get_item_or_error(
-            model, user, recipe, non_existing_error_message)
+            model, user, recipe, non_existing_error_message,
+        )
         if isinstance(item, Response):
             return item
         item.delete()
@@ -141,7 +155,8 @@ class RecipeViewSet(ModelViewSet):
         """Возвращает короткую ссылку на рецепт без сохранения в БД."""
         recipe = get_object_or_404(Recipe, pk=pk)
         encoded_id = base64.urlsafe_b64encode(
-            str(recipe.id).encode()).decode().rstrip('=')
+            str(recipe.id).encode(),
+        ).decode().rstrip('=')
         short_url = request.build_absolute_uri(f'/s/{encoded_id}/')
         return Response({'short-link': short_url}, status=status.HTTP_200_OK)
 
@@ -155,16 +170,18 @@ class RecipeViewSet(ModelViewSet):
         except (ValueError, base64.binascii.Error):
             return Response(
                 {'error': 'Некорректная короткая ссылка.'},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         recipe = get_object_or_404(Recipe, pk=recipe_id)
         serializer = RecipeListSerializer(recipe, context={'request': request})
         return Response(serializer.data)
 
-    @action(detail=True,
-            methods=['post'],
-            permission_classes=[IsAuthenticated])
+    @action(
+        detail=True,
+        methods=['post'],
+        permission_classes=[IsAuthenticated],
+    )
     def favorite(self, request, pk=None):
         recipe = get_object_or_404(Recipe, pk=pk)
         return self._add_recipe(
@@ -172,8 +189,11 @@ class RecipeViewSet(ModelViewSet):
             recipe,
             Favorite,
             FavoriteSerializer,
-            existing_error_message={'errors': (
-                'Рецепт уже добавлен в избранное.')},
+            existing_error_message={
+                'errors': (
+                'Рецепт уже добавлен в избранное.'
+                ),
+            },
         )
 
     @favorite.mapping.delete
@@ -186,9 +206,11 @@ class RecipeViewSet(ModelViewSet):
             non_existing_error_message={'errors': 'Рецепта нет в избранном.'},
         )
 
-    @action(detail=True,
-            methods=['post'],
-            permission_classes=[IsAuthenticated])
+    @action(
+        detail=True,
+        methods=['post'],
+        permission_classes=[IsAuthenticated],
+    )
     def shopping_cart(self, request, pk=None):
         recipe = get_object_or_404(Recipe, pk=pk)
         return self._add_recipe(
@@ -206,8 +228,11 @@ class RecipeViewSet(ModelViewSet):
             ShoppingCart,
             recipe,
             request.user,
-            non_existing_error_message={'errors': (
-                'Рецепта нет в списке покупок.')},
+            non_existing_error_message={
+                'errors': (
+                'Рецепта нет в списке покупок.'
+                ),
+            },
         )
 
     @action(detail=False, methods=['get'], url_path='download_shopping_cart')
@@ -273,12 +298,14 @@ class UserViewSet(DjoserUserViewSet):
             raise ValidationError('Нельзя подписаться на себя.')
         return author
 
-    @action(detail=False, methods=['post'],
-            permission_classes=(IsAuthenticated,))
+    @action(
+        detail=False, methods=['post'],
+        permission_classes=(IsAuthenticated,),
+    )
     def set_password(self, request):
         """Смена пароля."""
         serializer = SetPasswordSerializer(
-            data=request.data, context={'request': request}
+            data=request.data, context={'request': request},
         )
         serializer.is_valid(raise_exception=True)
         request.user.set_password(serializer.validated_data['new_password'])
@@ -286,29 +313,37 @@ class UserViewSet(DjoserUserViewSet):
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=False, methods=['get'],
-            permission_classes=(IsAuthenticated,))
+    @action(
+        detail=False, methods=['get'],
+        permission_classes=(IsAuthenticated,),
+    )
     def subscriptions(self, request):
         """Вывод всех авторов, на которых подписан текущий пользователь."""
         follows = User.objects.filter(following__user=request.user)
         page = self.paginate_queryset(follows)
         if page is not None:
             serializer = FollowSerializer(
-                page, many=True, context={'request': request})
+                page, many=True, context={'request': request},
+            )
             return self.get_paginated_response(serializer.data)
 
         serializer = FollowSerializer(
-            follows, many=True, context={'request': request})
+            follows, many=True, context={'request': request},
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['post'],
-            permission_classes=(IsAuthenticated,))
+    @action(
+        detail=True, methods=['post'],
+        permission_classes=(IsAuthenticated,),
+    )
     def subscribe(self, request, id):
         """Подписка на автора."""
         author = self._get_author_or_400(id)
         if Follow.objects.filter(user=request.user, author=author).exists():
-            return Response({'errors': 'Вы уже подписаны.'},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'errors': 'Вы уже подписаны.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         Follow.objects.create(user=request.user, author=author)
         serializer = FollowSerializer(author, context={'request': request})
@@ -320,14 +355,18 @@ class UserViewSet(DjoserUserViewSet):
         author = self._get_author_or_400(id)
         follow = Follow.objects.filter(user=request.user, author=author)
         if not follow.exists():
-            return Response({'errors': 'Вы не подписаны на этого автора.'},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'errors': 'Вы не подписаны на этого автора.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         follow.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=False, methods=['put'],
-            permission_classes=(IsAuthenticated,), url_path='me/avatar')
+    @action(
+        detail=False, methods=['put'],
+        permission_classes=(IsAuthenticated,), url_path='me/avatar',
+    )
     def avatar(self, request):
         user = request.user
 
@@ -336,17 +375,19 @@ class UserViewSet(DjoserUserViewSet):
                 user,
                 data=request.data,
                 partial=True,
-                context={'request': request}
+                context={'request': request},
             )
             serializer.is_valid(raise_exception=True)
             serializer.save()
 
             return Response(
                 {'avatar': request.build_absolute_uri(user.avatar.url)},
-                status=status.HTTP_200_OK
+                status=status.HTTP_200_OK,
             )
-        return Response({'errors': 'Нельзя передавать пустое поле avatar'},
-                        status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {'errors': 'Нельзя передавать пустое поле avatar'},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     @avatar.mapping.delete
     def remove_avatar(self, request):

@@ -1,6 +1,5 @@
-import pytest
-
 from django.contrib.auth import get_user_model
+import pytest
 from rest_framework.test import APIClient
 
 User = get_user_model()
@@ -18,7 +17,7 @@ def user(db):
         username='testuser',
         first_name='Test',
         last_name='User',
-        password='testpassword'
+        password='testpassword',
     )
 
 
@@ -37,7 +36,7 @@ def another_user(db):
         email='chef@example.com',
         first_name='Another',
         last_name='TestUser',
-        password='chefpass123'
+        password='chefpass123',
     )
 
 

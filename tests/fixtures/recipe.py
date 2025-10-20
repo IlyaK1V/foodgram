@@ -11,11 +11,12 @@ def recipe(user, tag, ingredient):
         name='Омлет',
         text='Смешайте яйца, обжарьте на сковороде.',
         cooking_time=10,
-        image='recipes/test.png'
+        image='recipes/test.png',
     )
     recipe.tags.add(tag)
     IngredientAmount.objects.create(
-        recipe=recipe, ingredient=ingredient, amount=2)
+        recipe=recipe, ingredient=ingredient, amount=2,
+    )
     return recipe
 
 

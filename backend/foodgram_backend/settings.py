@@ -1,5 +1,4 @@
 import os
-
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -73,7 +72,7 @@ if os.getenv('PYTEST') == '1':
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'test_db.sqlite3',
-        }
+        },
     }
 else:
     DATABASES = {
@@ -83,8 +82,8 @@ else:
             'USER': os.getenv('POSTGRES_USER', 'django'),
             'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
             'HOST': os.getenv('DB_HOST', ''),
-            'PORT': os.getenv('DB_PORT', 5432)
-        }
+            'PORT': os.getenv('DB_PORT', 5432),
+        },
     }
 
 # Password validation

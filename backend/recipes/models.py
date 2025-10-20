@@ -33,18 +33,18 @@ class User(AbstractUser):
     first_name = models.CharField(
         max_length=USERNAME_MAX_LENGTH,
         verbose_name='Имя',
-        help_text='Имя'
+        help_text='Имя',
     )
     last_name = models.CharField(
         max_length=USERNAME_MAX_LENGTH,
         verbose_name='Фамилия',
-        help_text='Фамилия'
+        help_text='Фамилия',
     )
     avatar = models.ImageField(
         upload_to='users/',
         blank=True,
         null=True,
-        verbose_name='Аватар'
+        verbose_name='Аватар',
     )
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
@@ -84,7 +84,7 @@ class Follow(models.Model):
             models.CheckConstraint(
                 check=~models.Q(user=models.F('author')),
                 name='prevent_self_follow',
-            )
+            ),
         ]
 
     def __str__(self):
@@ -118,7 +118,7 @@ class Ingredient(models.Model):
     )
     measurement_unit = models.CharField(
         max_length=MEASURMENT_UNIT_MAX_LENGTH,
-        verbose_name='Единица измерения'
+        verbose_name='Единица измерения',
     )
 
     class Meta:
@@ -218,13 +218,13 @@ class Favorite(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='favorites',
-        verbose_name='Пользователь'
+        verbose_name='Пользователь',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
         related_name='favorited_by',
-        verbose_name='Рецепт'
+        verbose_name='Рецепт',
     )
 
     class Meta:
@@ -233,8 +233,8 @@ class Favorite(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=('user', 'recipe'),
-                name='unique_favorite'
-            )
+                name='unique_favorite',
+            ),
         ]
 
     def __str__(self):
@@ -245,12 +245,12 @@ class ShoppingCart(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        verbose_name='Пользователь'
+        verbose_name='Пользователь',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        verbose_name='Рецепт'
+        verbose_name='Рецепт',
     )
 
     class Meta:
@@ -260,8 +260,8 @@ class ShoppingCart(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=('user', 'recipe'),
-                name='unique_shopping_cart'
-            )
+                name='unique_shopping_cart',
+            ),
         ]
 
     def __str__(self):

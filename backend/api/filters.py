@@ -1,5 +1,4 @@
 import django_filters
-
 from django_filters import rest_framework as filters
 from django_filters.widgets import BooleanWidget
 
@@ -29,7 +28,8 @@ class RecipeFilter(filters.FilterSet):
     tags = django_filters.AllValuesMultipleFilter(field_name='tags__slug')
     is_favorited = TransformativeBooleanFilter(method='filter_is_favorited')
     is_in_shopping_cart = TransformativeBooleanFilter(
-        method='filter_is_in_shopping_cart')
+        method='filter_is_in_shopping_cart',
+    )
 
     class Meta:
         model = Recipe
@@ -47,9 +47,13 @@ class RecipeFilter(filters.FilterSet):
         return queryset.exclude(**filter_kwargs)
 
     def filter_is_favorited(self, queryset, name, value):
-        return self._boolean_filter(queryset, name, value,
-                                    filter_field='favorited_by__user')
+        return self._boolean_filter(
+            queryset, name, value,
+            filter_field='favorited_by__user',
+        )
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
-        return self._boolean_filter(queryset, name, value,
-                                    filter_field='shopping_cart__user')
+        return self._boolean_filter(
+            queryset, name, value,
+            filter_field='shopping_cart__user',
+        )
