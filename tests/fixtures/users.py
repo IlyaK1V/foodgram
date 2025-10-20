@@ -62,3 +62,8 @@ def subscribe_another_user_url(another_user):
 @pytest.fixture
 def user_me_url():
     return '/api/users/me/'
+
+
+@pytest.fixture
+def first_user_url():
+    return '/api/users/1/'

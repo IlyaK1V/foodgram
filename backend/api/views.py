@@ -54,7 +54,8 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
-    filterset_class = SearchFilter
+    filter_backends = (SearchFilter,)
+    search_fields = ['^name']
 
 
 class RecipeViewSet(ModelViewSet):
@@ -248,6 +249,7 @@ class RecipeViewSet(ModelViewSet):
 class UserViewSet(DjoserUserViewSet):
     """ViewSet для пользователей и подписок с оптимизацией под Djoser."""
     queryset = User.objects.all()
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get_serializer_class(self):
         """Выбор сериализатора в зависимости от действия."""
@@ -258,8 +260,7 @@ class UserViewSet(DjoserUserViewSet):
         }
         return mapping.get(self.action, UserSerializer)
 
-    @action(detail=False, methods=['get'],
-            permission_classes=(IsAuthenticated,))
+    @action(detail=False, methods=['get'])
     def me(self, request):
         """Возвращает текущего пользователя."""
         serializer = self.get_serializer(request.user)

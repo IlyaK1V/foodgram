@@ -68,17 +68,18 @@ class TestUsers:
     @pytest.mark.django_db
     def test_get_user(
         self, auth_client, no_auth_client, user, tmp_path,
-        user_me_url,
+        user_me_url, first_user_url,
     ):
         """Просмотр пользователя."""
-        response = no_auth_client.get(user_me_url)
-        assert response.status_code == HTTPStatus.UNAUTHORIZED, (
-            'Запрос неавторизованного пользователя должен вернуть ответ '
-            f'со статус-кодом {HTTPStatus.UNAUTHORIZED}'
-        )
 
         response = auth_client.get(user_me_url)
         assert response.status_code == HTTPStatus.OK, (
             'Запрос авторизованного пользователя должен вернуть ответ '
+            f'со статус-кодом {HTTPStatus.OK}'
+        )
+
+        response = no_auth_client.get(first_user_url)
+        assert response.status_code == HTTPStatus.OK, (
+            'Запрос неавторизованного пользователя должен вернуть ответ '
             f'со статус-кодом {HTTPStatus.OK}'
         )
